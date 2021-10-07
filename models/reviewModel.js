@@ -50,6 +50,7 @@ reviewSchema.pre(/^find/, function(next) {
   //   path: 'user',
   //   select: 'name photo'
   // });
+  this.select('-__v');
 
   this.populate({
     path: 'user',
