@@ -9,24 +9,49 @@ const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter);
 
+//this route will get the distance between the user and the tour
+//specifing the distance, the lat and lng and the unit "MI, KM, etc"
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+//tours-within?distance=233&center=-40,45&unit=mi
+//tours-within/233/center/-40,45/unit/mi
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 router
   .route('/top-5-cheap')
   .get(tourController.aliasTopTours, tourController.getAllTours);
 
 router.route('/tour-stats').get(tourController.getTourStats);
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+
+router.route('/').get(tourController.getAllTours);
+
+//protect all routes after this middleware
+router.use(authController.protect);
+
+router
+  .route('/monthly-plan/:year')
+  .get(
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    tourController.getMonthlyPlan
+  );
 
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTours)
-  .post(tourController.createTour);
+  .post(
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.createTour
+  );
 
 router
   .route('/:id')
-  .get(authController.protect, tourController.getTour)
-  .patch(tourController.updateTour)
+  .get(tourController.getTour)
+  .patch(
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.updateTour
+  )
   .delete(
-    authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
   );

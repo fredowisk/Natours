@@ -418,6 +418,7 @@ body {
 .heading-box__detail:not(:last-child) {
   margin-right: 4rem;
 }
+
 .heading-box__icon {
   height: 2rem;
   width: 2rem;
@@ -493,6 +494,7 @@ body {
 }
 .overview-box__text {
   text-transform: capitalize;
+  transform: translateY(-2.8px);
 }
 .overview-box__img {
   border-radius: 50%;
@@ -551,6 +553,29 @@ body {
   width: 100%;
 }
 
+#zoom {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  width: 10%;
+  height: 40px;
+  padding: 10px;
+  transform: translateY(400%);
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  color: #fff;
+  background: #7dd56f;
+  z-index: 10000000;
+  cursor: pointer;
+  transition: 0.2s ease-in;
+}
+
+#zoom:hover {
+  background: #28b487;
+}
+
 .marker {
   background-image: url('../img/pin.png');
   background-size: cover;
@@ -574,7 +599,7 @@ body {
 
 .section-reviews {
   margin-top: calc(0px - var(--section-rotate));
-  padding: calc(5rem + var(--section-rotate)) 0;
+  padding: calc(5rem + var(--section-rotate)) 1rem;
   position: relative;
   z-index: 1000;
   background: -webkit-gradient(
@@ -607,7 +632,9 @@ body {
   overflow-x: scroll;
   -ms-scroll-snap-type: x mandatory;
   scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
 }
+
 .reviews__card {
   width: 30rem;
   padding: 4rem;
@@ -830,6 +857,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  justify-content: flex-end;
 }
 .footer__nav li {
   margin-left: 1.5rem;
@@ -1008,7 +1036,7 @@ body {
   height: 3.5rem;
   width: 3.5rem;
   border-radius: 50%;
-  margin-right: 1rem;
+  margin-left: 1rem;
 }
 
 .side-nav {
@@ -1231,6 +1259,9 @@ body {
   border-radius: 5px;
 }
 
+.password-box {
+}
+
 .form__input {
   display: block;
   font-family: inherit;
@@ -1251,11 +1282,22 @@ body {
   /* Pseudo element (a visible thing that isn't really in the DOM).
       Also needs -ms- */
 }
-.form__input:focus {
+
+#password-icon {
+  position: absolute;
+  height: 2.5rem;
+  width: 2.5rem;
+  fill: currentColor;
+  cursor: pointer;
+  transform: translateX(370px) translateY(12px);
+  z-index: 100000000;
+}
+
+.form__input:focus{
   outline: none;
   border-bottom: 3px solid #55c57a;
 }
-.form__input:focus:invalid {
+.form__input:focus:invalid{
   border-bottom: 3px solid #ff7730;
 }
 .form__input::-webkit-input-placeholder {

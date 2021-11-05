@@ -4,7 +4,6 @@ const catchAsync = require('../utils/catchAsync');
 
 exports.deleteOne = Model =>
   catchAsync(async (req, res, next) => {
-    console.log(req.params.id);
     const document = await Model.findByIdAndDelete(req.params.id);
 
     if (!document) {
@@ -82,6 +81,8 @@ exports.getAll = Model =>
       .limitFields()
       .paginate();
     const document = await features.query;
+    //statistics about the query execution
+    // .explain();
 
     // SEND RESPONSE
     res.status(200).json({

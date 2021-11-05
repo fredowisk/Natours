@@ -19,7 +19,8 @@ const createSendToken = (user, statusCode, res) => {
       //days * hours * seconds * miliseconds
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'lax'
   };
 
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
@@ -70,6 +71,16 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    sameSite: 'lax'
+  });
+
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   //Getting token and check if it's there
   let token;
@@ -78,6 +89,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -113,8 +126,39 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   //Grant access to protected route!
   req.user = freshUser;
+  res.locals.user = freshUser;
   next();
 });
+
+//Only for rendered pages, no errors!
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      //Verify token
+      const decodedToken = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      //Check if user still exists
+      const freshUser = await User.findById(decodedToken.id);
+      if (!freshUser) return next();
+
+      // iat (issued at) = Timestamp de quando o token foi criado;
+      //Check if user changed password after the token was issued
+      if (freshUser.changedPasswordAfter(decodedToken.iat)) {
+        return next();
+      }
+
+      //There is a logged in user
+      res.locals.user = freshUser;
+      return next();
+    } catch (error) {
+      return next();
+    }
+  }
+  next();
+};
 
 //wrapping the middleware to get access to the roles
 exports.restrictTo = (...roles) => {
@@ -219,6 +263,11 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   //Check if posted current password is correct
   if (!(await user.correctPassword(oldPassword, user.password)))
     return next(new AppError('Current password is incorrect!', 401));
+
+  if (await user.correctPassword(newPassword, user.password))
+    return next(
+      new AppError('New password cannot be equal to current password!')
+    );
 
   //If so update password
   user.password = newPassword;
