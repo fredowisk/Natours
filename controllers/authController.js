@@ -3,8 +3,9 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
+const Booking = require('../models/bookingModel');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
+const Email = require('../utils/email');
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -42,6 +43,8 @@ const createSendToken = (user, statusCode, res) => {
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
+  const url = `${req.protocol}://${req.get('host')}/me`;
+  await new Email(newUser, url).sendWelcome();
 
   // //Deleting the password property for security purposes
   // Reflect.deleteProperty(newUser._doc, 'password');
@@ -160,6 +163,20 @@ exports.isLoggedIn = async (req, res, next) => {
   next();
 };
 
+exports.isBookingPaid = async (req, res, next) => {
+  const booking = await Booking.findOne({
+    tour: req.params.tourId,
+    user: req.user.id
+  });
+
+  if (!booking)
+    return next(
+      new AppError('You just can review/rate a paid booked tour.', 401)
+    );
+
+  next();
+};
+
 //wrapping the middleware to get access to the roles
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
@@ -189,18 +206,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //Send it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/users/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit your new password to: ${resetURL}! \n If you didn't forget your password, please ignore this email!`;
-
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
-      message
-    });
+    const resetURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/users/resetPassword/${resetToken}`;
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',

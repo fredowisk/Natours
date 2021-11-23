@@ -76,7 +76,26 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false
     },
-    startDates: [Date],
+    startDates: [
+      {
+        date: Date,
+        participants: {
+          type: Number,
+          default: 0,
+          set: value => {
+            if (this.maxGroupSize <= value) {
+              this.soldOut = true;
+              return value;
+            }
+            return value;
+          }
+        },
+        soldOut: {
+          type: Boolean,
+          default: false
+        }
+      }
+    ],
     secretTour: {
       type: Boolean,
       default: false
@@ -141,6 +160,12 @@ tourSchema.virtual('durationWeeks').get(function() {
 //creating a virtual named reviews, referencing the Review model, and the tour field.
 tourSchema.virtual('reviews', {
   ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
+
+tourSchema.virtual('bookings', {
+  ref: 'Booking',
   foreignField: 'tour',
   localField: '_id'
 });

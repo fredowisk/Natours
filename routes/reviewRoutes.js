@@ -16,6 +16,10 @@ router
 router
   .route('/')
   .get(reviewController.getAllReviews)
-  .post(reviewController.setTourUserIds, reviewController.createReview);
+  .post(
+    reviewController.setTourUserIds,
+    authController.isBookingPaid,
+    reviewController.createReview
+  );
 
 module.exports = router;

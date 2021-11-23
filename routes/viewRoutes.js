@@ -1,10 +1,11 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
+const bookingController = require('../controllers/bookingController');
 
 const CSP = 'Content-Security-Policy';
 const POLICY =
-  "default-src 'self' https://*.mapbox.com wss://127.0.0.1:* ;" +
+  "default-src 'self' https://*.mapbox.com https://js.stripe.com/v3/ wss://127.0.0.1:* ;" +
   "base-uri 'self';block-all-mixed-content;" +
   "font-src 'self' https: data:;" +
   "frame-ancestors 'self';" +
@@ -21,10 +22,15 @@ router.use((req, res, next) => {
 });
 
 router.get('/me', authController.protect, viewsController.getAccount);
+router.get('/my-tours', authController.protect, viewsController.getMyTours);
 
 router.use(authController.isLoggedIn);
 
-router.get('/', viewsController.getOverview);
+router.get(
+  '/',
+  bookingController.createBookingCheckout,
+  viewsController.getOverview
+);
 
 router.get('/tours/:slug', viewsController.getTour);
 

@@ -1,13 +1,15 @@
 const express = require('express');
-const tourController = require('./../controllers/tourController');
+const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
 
 // router.param('id', tourController.checkID);
 
 router.use('/:tourId/reviews', reviewRouter);
+router.use('/:tourId/bookings', bookingRouter);
 
 //this route will get the distance between the user and the tour
 //specifing the distance, the lat and lng and the unit "MI, KM, etc"
@@ -49,6 +51,8 @@ router
   .get(tourController.getTour)
   .patch(
     authController.restrictTo('admin', 'lead-guide'),
+    tourController.uploadTourImages,
+    tourController.resizeTourImages,
     tourController.updateTour
   )
   .delete(

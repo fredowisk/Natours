@@ -1,8 +1,10 @@
 const express = require('express');
-const userController = require('./../controllers/userController');
+const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const bookingRouter = require('./bookingRoutes');
 
 const router = express.Router();
+router.use('/:userId/bookings', bookingRouter);
 
 router.post('/signup', authController.signUp);
 router.post('/login', authController.login);
@@ -16,13 +18,20 @@ router.use(authController.protect);
 
 router.patch('/updatePassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe
+);
 router.delete('/deleteMe', userController.deleteMe);
 
 //protecting all routes after this middleware
 router.use(authController.restrictTo('admin'));
 
 router.route('/').get(userController.getAllUsers);
+
+router.use(authController.restrictTo('admin', 'lead-guide'));
 
 router
   .route('/:id')
