@@ -1,7 +1,7 @@
 const express = require('express');
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
-const bookingController = require('../controllers/bookingController');
+// const bookingController = require('../controllers/bookingController');
 
 const CSP = 'Content-Security-Policy';
 const POLICY =
@@ -28,7 +28,7 @@ router.use(authController.isLoggedIn);
 
 router.get(
   '/',
-  bookingController.createBookingCheckout,
+  // bookingController.createBookingCheckout,
   viewsController.getOverview
 );
 
