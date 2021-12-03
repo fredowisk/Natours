@@ -9,6 +9,7 @@ const User = require('../models/userModel');
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
+  const { date } = req.body;
 
   // Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -24,7 +25,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       {
         name: `${tour.name} Tour`,
         description: tour.summary,
-        images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
+        images: [
+          `${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`
+        ],
         amount: tour.price * 100,
         currency: 'usd',
         quantity: 1
@@ -35,7 +38,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //Create session as response
   res.status(200).json({
     status: 'success',
-    session
+    session,
+    date
   });
 });
 
@@ -60,10 +64,8 @@ exports.isSoldOut = catchAsync(async (req, res, next) => {
       await tour.save();
       return next();
     }
-
-    return next(new AppError('Please inform one of the available dates'));
   } catch (error) {
-    return next(new AppError('Something went wrong! Try again.'));
+    return next(new AppError('Please inform one of the available dates'));
   }
 });
 
@@ -86,7 +88,7 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
     await tour.save();
     return next();
   } catch (error) {
-    return next(new AppError('Something went wrong! Try again.'));
+    return next(new AppError('Please inform one of the available dates'));
   }
 });
 
@@ -101,11 +103,12 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
 //   res.redirect(req.originalUrl.split('?')[0]);
 // });
 
-const createBookingCheckout = async session => {
+const createBookingCheckout = async (session, date) => {
   const tour = session.client_reference_id;
-  const user = await User.findOne({ email: session.customer_email }).id;
-  const price = session.line_items[0].amount / 100;
-  await Booking.create({ tour, user, price });
+  const user = (await User.findOne({ email: session.customer_email })).id;
+  const price = session.display_items[0].amount / 100;
+
+  await Booking.create({ tour, user, price, date });
 };
 
 exports.webhookCheckout = (req, res, next) => {
@@ -120,9 +123,9 @@ exports.webhookCheckout = (req, res, next) => {
   } catch (error) {
     return res.status(400).send(`Webhook error: ${error.message}`);
   }
-
-  if (event.type === 'checkout.session.complete')
+  if (event.type === 'checkout.session.completed') {
     createBookingCheckout(event.data.object);
+  }
 
   res.status(200).json({
     received: true
