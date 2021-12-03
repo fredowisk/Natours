@@ -106,11 +106,10 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
 const createBookingCheckout = async (session, date) => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
-  const price = session.line_items[0].amount / 100;
+  const price = session.amount_total / 100;
   const formattedDate = new Date(date);
-  console.log(formattedDate);
 
-  await Booking.create({ tour, user, price, formattedDate });
+  await Booking.create({ tour, user, price, date: formattedDate });
 };
 
 exports.webhookCheckout = (req, res, next) => {
