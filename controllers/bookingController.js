@@ -9,7 +9,6 @@ const User = require('../models/userModel');
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
-  const { date } = req.body;
 
   // Create checkout session
   const session = await stripe.checkout.sessions.create({
@@ -21,6 +20,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
+    metadata: {
+      date: res.locals.date
+    },
     line_items: [
       {
         name: `${tour.name} Tour`,
@@ -38,17 +40,17 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   //Create session as response
   res.status(200).json({
     status: 'success',
-    session,
-    date
+    session
   });
 });
 
 exports.isSoldOut = catchAsync(async (req, res, next) => {
   try {
     const tour = await Tour.findById(req.params.tourId);
+    const date = new Date(req.body.date);
 
     const dateIndex = tour.startDates.flatMap((value, index) => {
-      if (value.date - new Date(req.body.date) === 0) return index;
+      if (value.date - date === 0) return index;
 
       return [];
     });
@@ -58,6 +60,7 @@ exports.isSoldOut = catchAsync(async (req, res, next) => {
     }
 
     if (dateIndex.length > 0) {
+      res.locals.date = date;
       tour.startDates[dateIndex].participants += 1;
       req.body.tour = req.params.tourId;
       req.body.price = tour.price;
@@ -103,10 +106,11 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
 //   res.redirect(req.originalUrl.split('?')[0]);
 // });
 
-const createBookingCheckout = async (session, date) => {
+const createBookingCheckout = async session => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
   const price = session.amount_total / 100;
+  const { date } = session.metadata;
 
   await Booking.create({ tour, user, price, date });
 };
