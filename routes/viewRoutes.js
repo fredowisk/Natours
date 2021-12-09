@@ -16,6 +16,8 @@ const POLICY =
 
 const router = express.Router();
 
+router.use(viewsController.alerts);
+
 router.use((req, res, next) => {
   res.setHeader(CSP, POLICY);
   next();
