@@ -5,10 +5,12 @@ import { login, logout } from './login';
 import { updateUserData, updateUserPassword } from './updateSettings';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
+import { createAccount } from './signUp';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
+const signUpForm = document.querySelector('.form--sign-up');
 const logoutButton = document.querySelector('.nav__el--logout');
 const updateUserForm = document.querySelector('.form-user-data');
 const updatePasswordForm = document.querySelector('.form-user-settings');
@@ -40,6 +42,43 @@ if (loginForm) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);
+  });
+}
+
+if (signUpForm) {
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password');
+  const passwordConfirmation = document.getElementById('passwordConfirmation');
+
+  const icon = document.querySelectorAll('#password-icon');
+
+  icon[0].addEventListener('click', () => {
+    if (password.type === 'password') {
+      password.type = 'text';
+      icon[0].firstChild.attributes[0].nodeValue =
+        '/img/icons.svg#icon-eye-off';
+    } else {
+      password.type = 'password';
+      icon[0].firstChild.attributes[0].nodeValue = '/img/icons.svg#icon-eye';
+    }
+  });
+
+  icon[1].addEventListener('click', () => {
+    if (passwordConfirmation.type === 'password') {
+      passwordConfirmation.type = 'text';
+      icon[1].firstChild.attributes[0].nodeValue =
+        '/img/icons.svg#icon-eye-off';
+    } else {
+      passwordConfirmation.type = 'password';
+      icon[1].firstChild.attributes[0].nodeValue = '/img/icons.svg#icon-eye';
+    }
+  });
+
+  signUpForm.addEventListener('submit', e => {
+    e.preventDefault();
+    
+    createAccount(name, email, password.value, passwordConfirmation.value);
   });
 }
 

@@ -38,4 +38,6 @@ router.get('/tours/:slug', viewsController.getTour);
 
 router.get('/login', viewsController.getLogin);
 
+router.get('/sign-up', viewsController.signUp);
+
 module.exports = router;

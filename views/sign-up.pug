@@ -1,0 +1,30 @@
+extends base
+
+block content
+  main.main
+    .sign-up-form
+      h2.heading-secondary.ma-bt-lg Create your account
+      form.form.form--sign-up
+        .form__group
+          label.form__label(for='name') Name
+          input#name.form__input( placeholder='Your name', required)
+        .form__group
+          label.form__label(for='email') Email address
+          input#email.form__input(type='email', placeholder='you@example.com', required)
+        .form__group.ma-bt-md
+          label.form__label(for='password') Password
+          .password-box
+            svg#password-icon
+              use(xlink:href='/img/icons.svg#icon-eye')
+            input#password.form__input(type='password', placeholder='••••••••', required, minlength='8')
+        .form__group.ma-bt-md
+          label.form__label(for='passwordConfirmation') Password Confirmation
+          .password-box
+            svg#password-icon
+              use(xlink:href='/img/icons.svg#icon-eye')
+            input#passwordConfirmation.form__input(type='password', placeholder='••••••••', required, minlength='8')
+        .form__group
+          button.btn.btn--green Create
+
+  //- script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js')
+  //- script(src='/js/login.js')
