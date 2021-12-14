@@ -21,7 +21,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
     metadata: {
-      date: res.locals.date
+      index: res.locals.index
     },
     line_items: [
       {
@@ -47,26 +47,18 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 exports.isSoldOut = catchAsync(async (req, res, next) => {
   try {
     const tour = await Tour.findById(req.params.tourId);
-    const date = new Date(req.body.date);
 
-    const dateIndex = tour.startDates.flatMap((value, index) => {
-      if (value.date - date === 0) return index;
+    const dateIndex = tour.startDates.findIndex(value => !value.soldOut);
 
-      return [];
-    });
-
-    if (tour.startDates[dateIndex].soldOut) {
+    if (dateIndex < 0) {
       return next(new AppError('This tour is sold out!.', 401));
     }
 
-    if (dateIndex.length > 0) {
-      res.locals.date = date;
-      tour.startDates[dateIndex].participants += 1;
-      req.body.tour = req.params.tourId;
-      req.body.price = tour.price;
-      await tour.save();
-      return next();
-    }
+    res.locals.index = dateIndex;
+    req.body.tour = req.params.tourId;
+    req.body.price = tour.price;
+
+    return next();
   } catch (error) {
     return next(new AppError('Please inform one of the available dates'));
   }
@@ -83,10 +75,11 @@ exports.cancelBooking = catchAsync(async (req, res, next) => {
       return [];
     });
 
-    tour.startDates[dateIndex].participants -= 1;
+    const tourStats = tour.startDates[dateIndex];
 
-    if (tour.startDates[dateIndex].soldOut)
-      tour.startDates[dateIndex].soldOut = false;
+    tourStats.participants -= 1;
+
+    if (tourStats.soldOut) tourStats.soldOut = false;
 
     await tour.save();
     return next();
@@ -110,9 +103,24 @@ const createBookingCheckout = async session => {
   const tour = session.client_reference_id;
   const user = (await User.findOne({ email: session.customer_email })).id;
   const price = session.amount_total / 100;
-  const { date } = session.metadata;
+  const { index } = session.metadata;
 
-  await Booking.create({ tour, user, price, date });
+  const newTour = await Tour.findById(tour);
+
+  const tourStats = newTour.startDates[index];
+
+  await Booking.create({
+    tour,
+    user,
+    price,
+    date: tourStats.date
+  });
+
+  tourStats.participants += 1;
+
+  if (tourStats.participants === newTour.maxGroupSize) tourStats.soldOut = true;
+
+  await newTour.save();
 };
 
 exports.webhookCheckout = (req, res, next) => {

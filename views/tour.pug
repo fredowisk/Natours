@@ -32,7 +32,8 @@ block content
             svg.overview-box__icon
               use(xlink:href='/img/icons.svg#icon-calendar')
             span.overview-box__label Next date
-            span.overview-box__text= tour.startDates[0].date.toLocaleString('en-us', {month: 'long', year: 'numeric'})
+            - const tourStats = tour.startDates.find(value => !value.soldOut)
+            span.overview-box__text= tourStats ? tourStats.date.toLocaleString('en-us', {month: 'long', year: 'numeric'}) : `Sold Out`
           .overview-box__detail
             svg.overview-box__icon
               use(xlink:href='/img/icons.svg#icon-trending-up')

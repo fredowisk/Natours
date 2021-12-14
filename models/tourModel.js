@@ -81,14 +81,7 @@ const tourSchema = new mongoose.Schema(
         date: Date,
         participants: {
           type: Number,
-          default: 0,
-          set: value => {
-            if (this.maxGroupSize <= value) {
-              this.soldOut = true;
-              return value;
-            }
-            return value;
-          }
+          default: 0
         },
         soldOut: {
           type: Boolean,

@@ -16,14 +16,12 @@
     .card__data
       svg.card__icon
         use(xlink:href='img/icons.svg#icon-calendar')
-      span= tour.startDates[0].date.toLocaleString('en-us', {month: 'long', year: 'numeric'})
+        - const tourStats = tour.startDates.find(value => !value.soldOut)
+      span= tourStats ? tourStats.date.toLocaleString('en-us', {month: 'long', year: 'numeric'}) : `Sold Out`
     .card__data
       svg.card__icon
         use(xlink:href='img/icons.svg#icon-flag')
-        if (tour.locations.length > 1)
-          span= `${tour.locations.length} stops`
-        else 
-          span= `${tour.locations.length} stop`
+          span= (tour.locations.length > 1) ? ` stops` : ` stop`
     
     .card__data
       svg.card__icon
