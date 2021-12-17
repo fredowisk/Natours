@@ -77,3 +77,9 @@ exports.getMyTours = catchAsync(async (req, res) => {
     tours
   });
 });
+
+exports.getConfirmedUser = catchAsync(async (req, res) => {
+  res.status(200).render('userConfirmed', {
+    title: 'E-mail Confirmed!'
+  });
+});

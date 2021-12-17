@@ -40,13 +40,32 @@ const createSendToken = (user, statusCode, req, res) => {
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
 
-  // //Deleting the password property for security purposes
-  // Reflect.deleteProperty(newUser._doc, 'password');
+  //Generate the random email token
+  const emailToken = newUser.createEmailConfirmationToken();
 
-  createSendToken(newUser, 201, req, res);
+  const url = `${req.protocol}://${req.get('host')}/confirm/${emailToken}`;
+
+  try {
+    await new Email(newUser, url).sendWelcome();
+    //deactivating all validations that are in our schema
+    await newUser.save({ validateBeforeSave: false });
+
+    // //Deleting the password property for security purposes
+    // Reflect.deleteProperty(newUser._doc, 'password');
+
+    createSendToken(newUser, 201, req, res);
+  } catch (error) {
+    newUser.emailConfirmationToken = undefined;
+    await newUser.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'There was an error sending the email. Try again later!',
+        500
+      )
+    );
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -260,7 +279,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
   if (!user) {
-    next(new AppError('This user no longer exists', 404));
+    return next(new AppError('This user no longer exists', 404));
   }
 
   //Check if posted current password is correct
@@ -282,4 +301,30 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   //Log user in and send JWT
   createSendToken(user, 200, req, res);
+});
+
+exports.emailConfirmation = catchAsync(async (req, res, next) => {
+  //get user based on the token
+  //encrypting the user token, to search on the database
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  //searching for the user with the encrypted token, and verifying if the token has not expired
+  const user = await User.findOne({
+    emailConfirmationToken: hashedToken
+  });
+
+  if (!user)
+    return next(new AppError('This token is invalid or has expired!', 400));
+
+  //If token exists, and there is a user, confirm the e-mail
+
+  user.emailConfirmed = true;
+  user.emailConfirmationToken = undefined;
+
+  await user.save();
+
+  next();
 });

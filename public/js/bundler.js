@@ -9149,7 +9149,7 @@ var createAccount = /*#__PURE__*/function () {
             result = _context.sent;
 
             if (result.data.status === 'success') {
-              (0, _alerts.showAlert)('success', 'Account successfully created!');
+              (0, _alerts.showAlert)('success', 'Account successfully created! \n Please confirm your e-mail.');
               window.setTimeout(function () {
                 // eslint-disable-next-line no-restricted-globals
                 location.assign('/');
@@ -9492,8 +9492,8 @@ if (loginForm) {
 }
 
 if (signUpForm) {
-  var name = document.getElementById('name').value;
-  var email = document.getElementById('email').value;
+  var name = document.getElementById('name');
+  var email = document.getElementById('email');
   var password = document.getElementById('password');
   var passwordConfirmation = document.getElementById('passwordConfirmation');
 
@@ -9521,7 +9521,7 @@ if (signUpForm) {
 
   signUpForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    (0, _signUp.createAccount)(name, email, password.value, passwordConfirmation.value);
+    (0, _signUp.createAccount)(name.value, email.value, password.value, passwordConfirmation.value);
   });
 }
 

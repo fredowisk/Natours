@@ -34,6 +34,12 @@ router.get(
   viewsController.getOverview
 );
 
+router.get(
+  '/confirm/:token',
+  authController.emailConfirmation,
+  viewsController.getConfirmedUser
+);
+
 router.get('/tours/:slug', viewsController.getTour);
 
 router.get('/login', viewsController.getLogin);

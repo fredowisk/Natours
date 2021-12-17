@@ -44,6 +44,11 @@ const userSchema = mongoose.Schema(
         message: 'Passwords are not the same!'
       }
     },
+    emailConfirmationToken: String,
+    emailConfirmed: {
+      type: Boolean,
+      default: false
+    },
     passwordChangedAt: Date,
     createdAt: {
       type: Date,
@@ -135,6 +140,21 @@ userSchema.methods.createPasswordResetToken = function() {
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
+};
+
+userSchema.methods.createEmailConfirmationToken = function() {
+  //creating a random token that will be used to confirm the user e-mail
+  //this token will be sended to user e-mail
+  const emailToken = crypto.randomBytes(32).toString('hex');
+
+  //hashing the e-mail token, to save it in the database
+  //so if we get hacked, the hacker will not be able to know the user id
+  this.emailConfirmationToken = crypto
+    .createHash('sha256')
+    .update(emailToken)
+    .digest('hex');
+
+  return emailToken;
 };
 
 const User = mongoose.model('User', userSchema);

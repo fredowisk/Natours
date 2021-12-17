@@ -22,7 +22,7 @@ export const createAccount = async (
     });
 
     if (result.data.status === 'success') {
-      showAlert('success', 'Account successfully created!');
+      showAlert('success', 'Account successfully created! \n Please confirm your e-mail.');
       window.setTimeout(() => {
         // eslint-disable-next-line no-restricted-globals
         location.assign('/');

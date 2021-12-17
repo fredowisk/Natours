@@ -46,8 +46,8 @@ if (loginForm) {
 }
 
 if (signUpForm) {
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
+  const name = document.getElementById('name');
+  const email = document.getElementById('email');
   const password = document.getElementById('password');
   const passwordConfirmation = document.getElementById('passwordConfirmation');
 
@@ -78,7 +78,7 @@ if (signUpForm) {
   signUpForm.addEventListener('submit', e => {
     e.preventDefault();
     
-    createAccount(name, email, password.value, passwordConfirmation.value);
+    createAccount(name.value, email.value, password.value, passwordConfirmation.value);
   });
 }
 
