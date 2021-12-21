@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://sleepy-plateau-18407.herokuapp.com/"><img src="https://github.com/fredowisk/Natours/public/img/logo-green-round.png" alt="Natours" width="200"></a>
+  <a href="https://sleepy-plateau-18407.herokuapp.com/"><img src="https://github.com/fredowisk/Natours/blob/main/public/img/logo-green-round.png" alt="Natours" width="200"></a>
   <br>
   Natours
   <br>
