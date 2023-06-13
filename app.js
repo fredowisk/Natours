@@ -46,7 +46,7 @@ if (process.env.NODE_ENV === 'Development') {
 const limiter = rateLimit({
   max: 50,
   windowMs: 60 * 60 * 1000,
-  message: 'Too many requests from this IP, please try again in one hour!'
+  message: 'Too many requests from this IP, please try again in one hour!',
 });
 
 //using this middleware only for api
@@ -78,8 +78,8 @@ app.use(
       'ratingsAverage',
       'maxGroupSize',
       'difficulty',
-      'price'
-    ]
+      'price',
+    ],
   })
 );
 

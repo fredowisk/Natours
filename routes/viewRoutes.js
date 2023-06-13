@@ -28,11 +28,7 @@ router.get('/my-tours', authController.protect, viewsController.getMyTours);
 
 router.use(authController.isLoggedIn);
 
-router.get(
-  '/',
-  // bookingController.createBookingCheckout,
-  viewsController.getOverview
-);
+router.get('/', viewsController.getOverview);
 
 router.get(
   '/confirm/:token',

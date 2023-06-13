@@ -37,7 +37,7 @@ if (loginForm) {
     }
   });
 
-  loginForm.addEventListener('submit', e => {
+  loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -75,17 +75,22 @@ if (signUpForm) {
     }
   });
 
-  signUpForm.addEventListener('submit', e => {
+  signUpForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
-    createAccount(name.value, email.value, password.value, passwordConfirmation.value);
+
+    createAccount(
+      name.value,
+      email.value,
+      password.value,
+      passwordConfirmation.value
+    );
   });
 }
 
 if (logoutButton) logoutButton.addEventListener('click', logout);
 
 if (updateUserForm)
-  updateUserForm.addEventListener('submit', e => {
+  updateUserForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const name = document.getElementById('name').value;
@@ -102,7 +107,7 @@ if (updateUserForm)
   });
 
 if (updatePasswordForm)
-  updatePasswordForm.addEventListener('submit', async e => {
+  updatePasswordForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitButton = document.querySelector('.btn--save-password');
 
@@ -124,10 +129,11 @@ if (updatePasswordForm)
   });
 
 if (bookButton) {
-  bookButton.addEventListener('click', e => {
+  bookButton.addEventListener('click', async (e) => {
     e.target.textContent = 'Processing...';
+    console.log(e.target.dataset);
     const { tourId } = e.target.dataset;
-    bookTour(tourId);
+    await bookTour(tourId);
   });
 }
 

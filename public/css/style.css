@@ -128,6 +128,21 @@ body {
   line-height: 1.3;
   display: inline-block;
 }
+.heading-secondary--success {
+  background-image: -webkit-gradient(
+    linear,
+    left top,
+    right top,
+    from(rgba(125, 213, 111, 0.85)),
+    to(rgba(40, 180, 135, 0.85))
+  );
+  background-image: linear-gradient(
+    to right,
+    rgba(125, 213, 111, 0.85),
+    rgba(40, 180, 135, 0.85)
+  );
+  font-size: 3.5rem;
+}
 .heading-secondary--error {
   background-image: -webkit-gradient(
     linear,
@@ -1217,6 +1232,37 @@ body {
   align-self: center;
 }
 
+.success {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  max-width: 80rem;
+  text-align: center;
+}
+.success__title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.success__emoji {
+  font-size: 3.75rem;
+  margin-left: 1rem;
+}
+.success__msg {
+  font-size: 2.5rem;
+  font-weight: 700;
+  max-width: 50rem;
+  margin: 0 auto;
+}
 .error {
   position: absolute;
   top: 35%;
@@ -1249,7 +1295,8 @@ body {
   margin: 0 auto;
 }
 
-.login-form, .sign-up-form {
+.login-form,
+.sign-up-form {
   margin: 0 auto;
   max-width: 55rem;
   background-color: #fff;
@@ -1290,11 +1337,11 @@ body {
   z-index: 100000000;
 }
 
-.form__input:focus{
+.form__input:focus {
   outline: none;
   border-bottom: 3px solid #55c57a;
 }
-.form__input:focus:invalid{
+.form__input:focus:invalid {
   border-bottom: 3px solid #ff7730;
 }
 .form__input::-webkit-input-placeholder {

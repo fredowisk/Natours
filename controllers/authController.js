@@ -7,11 +7,10 @@ const Booking = require('../models/bookingModel');
 const AppError = require('../utils/appError');
 const Email = require('../utils/email');
 
-const signToken = id => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+const signToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
-};
 
 const createSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id);
@@ -23,7 +22,7 @@ const createSendToken = (user, statusCode, req, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
   });
 
   //removing the password for security purposes
@@ -33,8 +32,8 @@ const createSendToken = (user, statusCode, req, res) => {
     status: 'success',
     token,
     data: {
-      user: user
-    }
+      user: user,
+    },
   });
 };
 
@@ -52,7 +51,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     await newUser.save({ validateBeforeSave: false });
 
     // //Deleting the password property for security purposes
-    // Reflect.deleteProperty(newUser._doc, 'password');
+    Reflect.deleteProperty(newUser._doc, 'password');
 
     createSendToken(newUser, 201, req, res);
   } catch (error) {
@@ -178,7 +177,7 @@ exports.isLoggedIn = async (req, res, next) => {
 exports.isBookingPaid = async (req, res, next) => {
   const booking = await Booking.findOne({
     tour: req.params.tourId,
-    user: req.user.id
+    user: req.user.id,
   });
 
   if (!booking)
@@ -190,8 +189,9 @@ exports.isBookingPaid = async (req, res, next) => {
 };
 
 //wrapping the middleware to get access to the roles
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
     //roles ['admin', 'lead-guide']. role='user'
     //if the user role is not in the permitted roles stop the route!
     if (!roles.includes(req.user.role)) {
@@ -203,7 +203,6 @@ exports.restrictTo = (...roles) => {
     //and if is included, just pass for the next middleware
     next();
   };
-};
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   //Get user based on posted email
@@ -226,7 +225,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
-      message: 'Token sent to email!'
+      message: 'Token sent to email!',
     });
   } catch (error) {
     user.passwordResetToken = undefined;
@@ -253,7 +252,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //searching for the user with the encrypted token, and verifying if the token has not expired
   const user = await User.findOne({
     passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    passwordResetExpires: { $gt: Date.now() },
   });
 
   //If token has not expired, and there is a user, set the new password
@@ -313,7 +312,7 @@ exports.emailConfirmation = catchAsync(async (req, res, next) => {
 
   //searching for the user with the encrypted token, and verifying if the token has not expired
   const user = await User.findOne({
-    emailConfirmationToken: hashedToken
+    emailConfirmationToken: hashedToken,
   });
 
   if (!user)
@@ -322,9 +321,9 @@ exports.emailConfirmation = catchAsync(async (req, res, next) => {
   //If token exists, and there is a user, confirm the e-mail
 
   user.emailConfirmed = true;
-  user.emailConfirmationToken = undefined;
+  user.emailConfirmationToken = null;
 
-  await user.save();
+  await User.updateOne({ _id: user._id }, user);
 
   next();
 });

@@ -10,25 +10,27 @@ module.exports = class Email {
     this.from = `Fredowisk <${process.env.EMAIL_FROM}>`;
   }
 
-  createNewTransport() {
+  async createNewTransport() {
     if (process.env.NODE_ENV === 'Production') {
       //Sendgrid
       return nodemailer.createTransport({
-        service: 'SendGrid',
+        host: 'smtp.sendgrid.net',
+        port: 587,
         auth: {
           user: process.env.SENDGRID_USERNAME,
-          pass: process.env.SENDGRID_PASSWORD
-        }
+          pass: process.env.SENDGRID_PASSWORD,
+        },
       });
     }
+
     //Create a transporter
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: process.env.EMAIL_PORT,
       auth: {
         user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD
-      }
+        pass: process.env.EMAIL_PASSWORD,
+      },
       //Activate in gmail "less secure app" option
     });
   }
@@ -41,7 +43,7 @@ module.exports = class Email {
       {
         firstName: this.firstName,
         url: this.url,
-        subject
+        subject,
       }
     );
 
@@ -51,12 +53,12 @@ module.exports = class Email {
       to: this.to,
       subject,
       html,
-      text: htmlToText(html)
+      text: htmlToText(html),
     };
 
     //Create a transport and send email
-    this.createNewTransport();
-    await this.createNewTransport().sendMail(mailOptions);
+    const transporter = await this.createNewTransport();
+    await transporter.sendMail(mailOptions);
   }
 
   async sendWelcome() {

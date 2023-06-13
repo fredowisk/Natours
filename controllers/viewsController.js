@@ -21,7 +21,7 @@ exports.getOverview = catchAsync(async (req, res, next) => {
   // Render that template using tour data from step 1
   res.status(200).render('overview', {
     title: 'All Tours',
-    tours
+    tours,
   });
 });
 
@@ -31,7 +31,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
 
   const tour = await Tour.findOne({ slug: tourSlug }).populate({
     path: 'reviews',
-    fields: 'review rating user'
+    fields: 'review rating user',
   });
 
   if (!tour) {
@@ -42,25 +42,25 @@ exports.getTour = catchAsync(async (req, res, next) => {
   //Render template using data from step 1
   res.status(200).render('tour', {
     title: `${tour.name} Tour`,
-    tour
+    tour,
   });
 });
 
 exports.getLogin = catchAsync(async (req, res, next) => {
   res.status(200).render('login', {
-    title: 'Login'
+    title: 'Login',
   });
 });
 
 exports.signUp = catchAsync(async (req, res, next) => {
   res.status(200).render('sign-up', {
-    title: 'Sign Up'
+    title: 'Sign Up',
   });
 });
 
 exports.getAccount = (req, res) => {
   res.status(200).render('account', {
-    title: 'Your account'
+    title: 'Your account',
   });
 };
 
@@ -69,17 +69,17 @@ exports.getMyTours = catchAsync(async (req, res) => {
   const bookings = await Booking.find({ user: req.user.id });
 
   //Find tours with the returned IDs
-  const tourIDs = bookings.map(booking => booking.tour);
+  const tourIDs = bookings.map((booking) => booking.tour);
   const tours = await Tour.find({ _id: { $in: tourIDs } });
 
   res.status(200).render('overview', {
     title: 'My Tours',
-    tours
+    tours,
   });
 });
 
 exports.getConfirmedUser = catchAsync(async (req, res) => {
   res.status(200).render('userConfirmed', {
-    title: 'E-mail Confirmed!'
+    title: 'E-mail Confirmed!',
   });
 });

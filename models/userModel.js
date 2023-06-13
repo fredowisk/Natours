@@ -8,74 +8,74 @@ const userSchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Please tell us your name!'],
-      maxlength: [40, 'An username must have less or equal than 40 characters']
+      maxlength: [40, 'An username must have less or equal than 40 characters'],
     },
     email: {
       type: String,
       required: [true, 'An user must have an email!'],
       unique: true,
       lowercase: true,
-      validate: [validator.default.isEmail, 'Please provide a valid email']
+      validate: [validator.default.isEmail, 'Please provide a valid email'],
     },
     photo: {
       type: String,
-      default: 'default.jpg'
+      default: 'default.jpg',
     },
     role: {
       type: String,
       enum: ['user', 'guide', 'lead-guide', 'admin'],
-      default: 'user'
+      default: 'user',
     },
     password: {
       type: String,
       required: [true, 'Please provide a password!'],
       minlength: 8,
       //the password will never be showed in any input
-      select: false
+      select: false,
     },
     passwordConfirmation: {
       type: String,
       required: [true, 'Please provide a password confirmation!'],
       validate: {
         //This only works on create and save!!!!!
-        validator: function(item) {
+        validator: function (item) {
           return item === this.password;
         },
-        message: 'Passwords are not the same!'
-      }
+        message: 'Passwords are not the same!',
+      },
     },
     emailConfirmationToken: String,
     emailConfirmed: {
       type: Boolean,
-      default: false
+      default: false,
     },
     passwordChangedAt: Date,
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false
+      select: false,
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
     active: {
       type: Boolean,
       default: true,
-      select: false
-    }
+      select: false,
+    },
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
 userSchema.virtual('bookings', {
   ref: 'Booking',
   foreignField: 'user',
-  localField: '_id'
+  localField: '_id',
 });
 
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   //If the password is already modified just call the next middleware
   if (!this.isModified('password')) return next();
 
@@ -87,21 +87,21 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
-userSchema.pre(/^find/, function(next) {
+userSchema.pre(/^find/, function (next) {
   //this points to the current query
   this.find({ active: { $ne: false } });
   next();
 });
 
 //using bcrypt to unhash the password and compare
-userSchema.methods.correctPassword = async function(
+userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
@@ -109,7 +109,7 @@ userSchema.methods.correctPassword = async function(
 };
 
 //updating the last time password was changed
-userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
@@ -124,7 +124,7 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
 };
 
 //creating the reset password token
-userSchema.methods.createPasswordResetToken = function() {
+userSchema.methods.createPasswordResetToken = function () {
   //creating a random token that will be used to reset password
   //this token will be sended to user e-mail
   const resetToken = crypto.randomBytes(32).toString('hex');
@@ -142,7 +142,7 @@ userSchema.methods.createPasswordResetToken = function() {
   return resetToken;
 };
 
-userSchema.methods.createEmailConfirmationToken = function() {
+userSchema.methods.createEmailConfirmationToken = function () {
   //creating a random token that will be used to confirm the user e-mail
   //this token will be sended to user e-mail
   const emailToken = crypto.randomBytes(32).toString('hex');
