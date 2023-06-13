@@ -2,14 +2,14 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "Learning node, express and mongoDB",
-  "main": "bundler.js",
+  "main": "dist/bundler.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prod": "(set NODE_ENV=Production) && nodemon server.js",
     "debug": "ndb server.js",
     "watch": "parcel watch ./public/js/index.js --dist-dir ./public/js --no-hmr",
-    "build": "parcel build ./public/js/index.js --dist-dir dist"
+    "build": "parcel build ./public/js/index.js"
   },
   "author": "Jonas Schmedtmann",
   "license": "ISC",
