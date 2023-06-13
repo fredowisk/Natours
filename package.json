@@ -9,7 +9,8 @@
     "prod": "(set NODE_ENV=Production) && nodemon server.js",
     "debug": "ndb server.js",
     "watch": "parcel watch ./public/js/index.js --dist-dir ./public/js --no-hmr",
-    "build": "parcel build ./public/js/index.js"
+    "build": "parcel build ./public/js/index.js",
+    "vercel-build": "npx run start"
   },
   "author": "Jonas Schmedtmann",
   "license": "ISC",
