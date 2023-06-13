@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "description": "Learning node, express and mongoDB",
   "main": "bundler.js",
-  "homepage": "/",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "prod": "(set NODE_ENV=Production) && nodemon server.js",
     "debug": "ndb server.js",
     "watch": "parcel watch ./public/js/index.js --dist-dir ./public/js --no-hmr",
-    "build": "parcel build ./public/js/index.js --dist-dir ./public/js"
+    "build": "parcel build ./public/js/index.js --dist-dir dist"
   },
   "author": "Jonas Schmedtmann",
   "license": "ISC",
