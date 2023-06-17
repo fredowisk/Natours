@@ -24,8 +24,9 @@
 </p>
 
 ## Deployed Version
-Live demo (Feel free to visit) 👉 : https://sleepy-plateau-18407.herokuapp.com/
+Live demo (Feel free to visit) 👉 : https://natours-sand.vercel.app/
 
+![natours](https://github.com/fredowisk/Natours/assets/53921083/5b875b83-ddb6-4dd0-81cd-49d95c2d9ac7)
 
 ## Key Features
 
